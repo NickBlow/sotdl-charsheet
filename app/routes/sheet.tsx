@@ -2,10 +2,22 @@ import type { Route } from "./+types/home";
 import ShadowOfTheDemonLordSheet from "~/components/Sheet";
 import { useParams } from "react-router";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ matches }: Route.MetaArgs) {
+  const charData = matches.filter((x) => x?.id == "routes/sheet")[0];
+  // @ts-ignore
+  const name = charData?.data?.info?.name;
+  if (!charData || !name) {
+    return [
+      { title: "New Character" },
+      { name: "description", content: "New SotDL character!" },
+    ];
+  }
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: `Charsheet for ${name}` },
+    {
+      name: "description",
+      content: `Shadow of the demon lord character sheet for ${name}`,
+    },
   ];
 }
 

@@ -4,8 +4,8 @@ import { generateCharacterId } from "~/util/id-gen";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "SotDL Char Sheet" },
+    { name: "description", content: "Online Char Sheet for Demon Lord!" },
   ];
 }
 
