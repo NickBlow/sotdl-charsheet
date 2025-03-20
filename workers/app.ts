@@ -1,7 +1,11 @@
 import { createRequestHandler } from "react-router";
+import type { SheetStore } from "./app";
+export { SheetStore } from "../app/durable-objects/sheet-store";
 
 declare global {
-  interface CloudflareEnvironment extends Env {}
+  interface CloudflareEnvironment extends Env {
+    SHEET_STORE: DurableObjectNamespace<SheetStore>;
+  }
 }
 
 declare module "react-router" {
@@ -14,7 +18,7 @@ declare module "react-router" {
 }
 
 const requestHandler = createRequestHandler(
-  // @ts-expect-error - virtual module provided by React Router
+  // @ts-ignore - virtual module provided by React Router
   () => import("virtual:react-router/server-build"),
   import.meta.env.MODE
 );

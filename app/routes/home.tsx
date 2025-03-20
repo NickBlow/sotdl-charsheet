@@ -1,5 +1,6 @@
+import { redirect } from "react-router";
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { generateCharacterId } from "~/util/id-gen";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -8,10 +9,11 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.cloudflare.env.VALUE_FROM_CLOUDFLARE };
+export function loader() {
+  const newId = generateCharacterId();
+  return redirect(`${newId}`);
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
-  return <Welcome message={loaderData.message} />;
+export default function Home() {
+  return <></>;
 }

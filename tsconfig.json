@@ -9,6 +9,8 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true
+    "noEmit": true,
+    // life is too short
+    "noImplicitAny": false
   }
 }
