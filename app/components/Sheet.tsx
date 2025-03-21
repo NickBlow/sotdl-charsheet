@@ -204,45 +204,49 @@ const ShadowOfTheDemonLordSheet = ({
   return (
     <div className="bg-gray-50 min-h-screen p-4">
       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header with buttons */}
-        <div className="p-4 flex justify-between items-center border-b border-gray-200">
+        {/* Header with buttons - improved for mobile */}
+        <div className="p-4 flex flex-col sm:flex-row justify-between items-center border-b border-gray-200 gap-4">
           <div>
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-md mr-2 flex items-center"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center w-full sm:w-auto"
               onClick={handleNewCharacter}
             >
               New Character
             </button>
           </div>
-          <div className="flex items-center">
-            <span className="text-green-600 mr-2">
-              {fetcher.state !== "idle" ? "Saving..." : ""}
-              {revalidator.state !== "idle" ? "Refreshing..." : ""}
-            </span>
-            {charData?.lastSaved && (
-              <span className="text-gray-500 mr-2">
-                Last saved: {charData.lastSaved}
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <div className="flex items-center">
+              <span className="text-green-600 text-sm">
+                {fetcher.state !== "idle" ? "Saving..." : ""}
+                {revalidator.state !== "idle" ? "Refreshing..." : ""}
               </span>
-            )}
-            <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-md mr-2 flex items-center"
-              onClick={saveCharacter}
-            >
-              <Save className="mr-1 h-4 w-4" />
-              Save
-            </button>
-            <button
-              className="bg-gray-600 text-white px-4 py-2 rounded-md flex items-center"
-              onClick={handleShare}
-            >
-              <Share2 className="mr-1 h-4 w-4" />
-              Share
-            </button>
+              {charData?.lastSaved && (
+                <span className="text-gray-500 text-sm ml-2 hidden sm:inline">
+                  Last saved: {charData.lastSaved}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                className="bg-blue-600 text-white px-3 py-2 rounded-md flex items-center"
+                onClick={saveCharacter}
+              >
+                <Save className="mr-1 h-4 w-4" />
+                Save
+              </button>
+              <button
+                className="bg-gray-600 text-white px-3 py-2 rounded-md flex items-center"
+                onClick={handleShare}
+              >
+                <Share2 className="mr-1 h-4 w-4" />
+                Share
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-200 overflow-x-auto">
+        {/* Tabs - improved for mobile */}
+        <div className="flex border-b border-gray-200 overflow-x-auto whitespace-nowrap">
           {[
             "info",
             "stats",
@@ -254,7 +258,7 @@ const ShadowOfTheDemonLordSheet = ({
           ].map((tab) => (
             <button
               key={tab}
-              className={`px-6 py-3 text-lg font-medium ${
+              className={`px-3 sm:px-6 py-3 text-sm sm:text-lg font-medium ${
                 activeTab === tab
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-gray-700"
@@ -354,9 +358,9 @@ const ShadowOfTheDemonLordSheet = ({
         </div>
       </div>
 
-      {/* Toast Notification */}
+      {/* Toast Notification - better positioning for mobile */}
       {showToast && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center">
+        <div className="fixed bottom-4 left-4 sm:left-auto sm:right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center z-50">
           <Check className="mr-2 h-4 w-4" />
           Copied!
         </div>
