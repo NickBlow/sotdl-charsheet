@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Save, Share2 } from "lucide-react";
+import { Save, Share2, Check } from "lucide-react";
 import InfoTab from "./InfoTab";
 import StatsTab from "./StatsTab";
 import WeaponsTab from "./WeaponsTab";
@@ -20,6 +20,9 @@ const ShadowOfTheDemonLordSheet = ({
   const previousCharacterRef = useRef<string>(null!);
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   let fetcher = useFetcher();
+
+  // Add state for toast notification
+  const [showToast, setShowToast] = useState(false);
 
   const [character, setCharacter] = useState(
     charData || {
@@ -176,6 +179,28 @@ const ShadowOfTheDemonLordSheet = ({
     navigate("/");
   };
 
+  // Handle share button click
+  const handleShare = () => {
+    // Get the current URL
+    const currentUrl = window.location.href;
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(currentUrl)
+      .then(() => {
+        // Show toast notification
+        setShowToast(true);
+
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+          setShowToast(false);
+        }, 3000);
+      })
+      .catch((error) => {
+        console.error("Error copying to clipboard:", error);
+      });
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen p-4">
       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
@@ -206,7 +231,10 @@ const ShadowOfTheDemonLordSheet = ({
               <Save className="mr-1 h-4 w-4" />
               Save
             </button>
-            <button className="bg-gray-600 text-white px-4 py-2 rounded-md flex items-center">
+            <button
+              className="bg-gray-600 text-white px-4 py-2 rounded-md flex items-center"
+              onClick={handleShare}
+            >
               <Share2 className="mr-1 h-4 w-4" />
               Share
             </button>
@@ -325,6 +353,14 @@ const ShadowOfTheDemonLordSheet = ({
           )}
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center">
+          <Check className="mr-2 h-4 w-4" />
+          Copied!
+        </div>
+      )}
     </div>
   );
 };
