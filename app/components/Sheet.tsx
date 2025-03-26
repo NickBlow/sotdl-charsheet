@@ -5,7 +5,7 @@ import StatsTab from "./StatsTab";
 import WeaponsTab from "./WeaponsTab";
 import PathsTab from "./PathsTab";
 import TalentsTab from "./TalentsTab";
-import AncestryTraitsTab from "./AncestryTraitsTab"; // Don't forget to import this
+import AncestryTraitsTab from "./AncestryTraitsTab";
 import SpellsTab from "./SpellsTab";
 import EquipmentTab from "./EquipmentTab";
 import {
@@ -13,6 +13,7 @@ import {
   useNavigate,
   useRevalidator,
   useSearchParams,
+  useLocation,
 } from "react-router";
 
 const ShadowOfTheDemonLordSheet = ({
@@ -22,10 +23,10 @@ const ShadowOfTheDemonLordSheet = ({
 }) => {
   const revalidator = useRevalidator();
   const navigate = useNavigate();
-
-  // Use search params for tab state
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get("tab");
+
+  // Define valid tabs
   const validTabs = [
     "info",
     "stats",
@@ -37,10 +38,10 @@ const ShadowOfTheDemonLordSheet = ({
     "equipment",
   ];
 
-  // Set default tab to "info" if the URL parameter is missing or invalid
-  const [activeTab, setActiveTab] = useState(
-    validTabs.includes(tabFromUrl || "") ? tabFromUrl : "info"
-  );
+  // Get the active tab from URL params or from hash for better performance
+  // Using hash fragment for tab navigation has less overhead than search params
+  const tabFromHash = location.hash.slice(1); // Remove the # character
+  const activeTab = validTabs.includes(tabFromHash) ? tabFromHash : "info";
 
   const previousCharacterRef = useRef<string>(null!);
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,8 +50,9 @@ const ShadowOfTheDemonLordSheet = ({
   // Add state for toast notification
   const [showToast, setShowToast] = useState(false);
 
-  const [character, setCharacter] = useState(
-    charData || {
+  const [character, setCharacter] = useState(() => {
+    // Initialize with default character if no charData, otherwise use charData
+    const data = charData || {
       info: {
         name: "",
         level: 1,
@@ -97,7 +99,6 @@ const ShadowOfTheDemonLordSheet = ({
           .map(() => ({ name: "", details: "" })),
       },
       talents: [],
-      ancestryTraits: [], // Add this line for the new ancestryTraits array
       spells: [],
       equipment: {
         currency: {
@@ -108,33 +109,29 @@ const ShadowOfTheDemonLordSheet = ({
         },
         items: [],
       },
-    }
-  );
+    };
 
-  // Handle tab changes
+    // Ensure ancestryTraits field exists (backward compatibility)
+    data.ancestryTraits = data.ancestryTraits || [];
+
+    return data;
+  });
+
+  // Handle tab changes using URL hash for better performance
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
-
-    // Update URL without triggering a navigation
-    setSearchParams({ tab }, { replace: true });
+    // Update URL hash instead of search params
+    window.location.hash = tab;
   };
-
-  // Update the active tab when URL changes (e.g., when user uses browser back/forward)
-  useEffect(() => {
-    const tabFromUrl = searchParams.get("tab");
-    if (
-      tabFromUrl &&
-      validTabs.includes(tabFromUrl) &&
-      tabFromUrl !== activeTab
-    ) {
-      setActiveTab(tabFromUrl);
-    }
-  }, [searchParams, activeTab, validTabs]);
 
   // Initialize previousCharacterRef with the initial character data
   useEffect(() => {
     console.log("Setting initial character reference");
     previousCharacterRef.current = JSON.stringify(character);
+
+    // Set the default tab to "info" if no tab is specified in the URL
+    if (!location.hash) {
+      window.location.hash = "info";
+    }
   }, []);
 
   // Update character state when charData changes from revalidation
@@ -150,8 +147,15 @@ const ShadowOfTheDemonLordSheet = ({
         fetcher.state === "idle"
       ) {
         console.log("Updating character from revalidated data");
-        setCharacter(charData);
-        previousCharacterRef.current = newDataString;
+
+        // Ensure charData has ancestryTraits field
+        const updatedCharData = {
+          ...charData,
+          ancestryTraits: charData.ancestryTraits || [],
+        };
+
+        setCharacter(updatedCharData);
+        previousCharacterRef.current = JSON.stringify(updatedCharData);
       }
     }
   }, [charData, fetcher.state]);
