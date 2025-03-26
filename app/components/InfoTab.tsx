@@ -1,5 +1,3 @@
-import React from "react";
-
 const InfoTab = ({ info, onChange }) => {
   // Handle input changes
   const handleChange = (field, value) => {
@@ -8,11 +6,11 @@ const InfoTab = ({ info, onChange }) => {
       [field]: value,
     });
   };
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-6">Character Information</h2>
 
+      {/* Top section - Primary character details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -21,11 +19,10 @@ const InfoTab = ({ info, onChange }) => {
           <input
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={info.name}
+            value={info.name || ""}
             onChange={(e) => handleChange("name", e.target.value)}
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Level
@@ -33,7 +30,7 @@ const InfoTab = ({ info, onChange }) => {
           <input
             type="number"
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={info.level}
+            value={info.level || 0}
             onChange={(e) =>
               handleChange("level", parseInt(e.target.value) || 0)
             }
@@ -41,6 +38,33 @@ const InfoTab = ({ info, onChange }) => {
         </div>
       </div>
 
+      {/* Personality and Background - Added as requested */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Personality
+          </label>
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded-md"
+            rows={3}
+            value={info.personality || ""}
+            onChange={(e) => handleChange("personality", e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Background
+          </label>
+          <textarea
+            className="w-full p-2 border border-gray-300 rounded-md"
+            rows={3}
+            value={info.background || ""}
+            onChange={(e) => handleChange("background", e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Heritage information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -49,11 +73,10 @@ const InfoTab = ({ info, onChange }) => {
           <input
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={info.ancestry}
+            value={info.ancestry || ""}
             onChange={(e) => handleChange("ancestry", e.target.value)}
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Professions
@@ -61,12 +84,13 @@ const InfoTab = ({ info, onChange }) => {
           <textarea
             className="w-full p-2 border border-gray-300 rounded-md"
             rows={3}
-            value={info.professions}
+            value={info.professions || ""}
             onChange={(e) => handleChange("professions", e.target.value)}
           />
         </div>
       </div>
 
+      {/* Languages section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -75,11 +99,10 @@ const InfoTab = ({ info, onChange }) => {
           <input
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={info.languagesSpoke}
+            value={info.languagesSpoke || ""}
             onChange={(e) => handleChange("languagesSpoke", e.target.value)}
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Languages: Read and Write
@@ -87,12 +110,13 @@ const InfoTab = ({ info, onChange }) => {
           <input
             type="text"
             className="w-full p-2 border border-gray-300 rounded-md"
-            value={info.languagesReadWrite}
+            value={info.languagesReadWrite || ""}
             onChange={(e) => handleChange("languagesReadWrite", e.target.value)}
           />
         </div>
       </div>
 
+      {/* Lifestyle */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Lifestyle
@@ -100,11 +124,12 @@ const InfoTab = ({ info, onChange }) => {
         <input
           type="text"
           className="w-full p-2 border border-gray-300 rounded-md"
-          value={info.lifestyle}
+          value={info.lifestyle || ""}
           onChange={(e) => handleChange("lifestyle", e.target.value)}
         />
       </div>
 
+      {/* Description */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Description
@@ -112,11 +137,12 @@ const InfoTab = ({ info, onChange }) => {
         <textarea
           className="w-full p-2 border border-gray-300 rounded-md"
           rows={5}
-          value={info.description}
+          value={info.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
         />
       </div>
 
+      {/* Notes */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Notes
@@ -124,7 +150,7 @@ const InfoTab = ({ info, onChange }) => {
         <textarea
           className="w-full p-2 border border-gray-300 rounded-md"
           rows={5}
-          value={info.notes}
+          value={info.notes || ""}
           onChange={(e) => handleChange("notes", e.target.value)}
         />
       </div>

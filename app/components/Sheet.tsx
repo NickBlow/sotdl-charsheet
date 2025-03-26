@@ -5,9 +5,15 @@ import StatsTab from "./StatsTab";
 import WeaponsTab from "./WeaponsTab";
 import PathsTab from "./PathsTab";
 import TalentsTab from "./TalentsTab";
+import AncestryTraitsTab from "./AncestryTraitsTab"; // Don't forget to import this
 import SpellsTab from "./SpellsTab";
 import EquipmentTab from "./EquipmentTab";
-import { useFetcher, useNavigate, useRevalidator } from "react-router";
+import {
+  useFetcher,
+  useNavigate,
+  useRevalidator,
+  useSearchParams,
+} from "react-router";
 
 const ShadowOfTheDemonLordSheet = ({
   initialData: charData,
@@ -16,7 +22,26 @@ const ShadowOfTheDemonLordSheet = ({
 }) => {
   const revalidator = useRevalidator();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("info");
+
+  // Use search params for tab state
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const validTabs = [
+    "info",
+    "stats",
+    "weapons",
+    "paths",
+    "talents",
+    "ancestryTraits",
+    "spells",
+    "equipment",
+  ];
+
+  // Set default tab to "info" if the URL parameter is missing or invalid
+  const [activeTab, setActiveTab] = useState(
+    validTabs.includes(tabFromUrl || "") ? tabFromUrl : "info"
+  );
+
   const previousCharacterRef = useRef<string>(null!);
   const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   let fetcher = useFetcher();
@@ -29,6 +54,8 @@ const ShadowOfTheDemonLordSheet = ({
       info: {
         name: "",
         level: 1,
+        personality: "",
+        background: "",
         ancestry: "",
         professions: "",
         languagesSpoke: "",
@@ -70,6 +97,7 @@ const ShadowOfTheDemonLordSheet = ({
           .map(() => ({ name: "", details: "" })),
       },
       talents: [],
+      ancestryTraits: [], // Add this line for the new ancestryTraits array
       spells: [],
       equipment: {
         currency: {
@@ -82,6 +110,26 @@ const ShadowOfTheDemonLordSheet = ({
       },
     }
   );
+
+  // Handle tab changes
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+
+    // Update URL without triggering a navigation
+    setSearchParams({ tab }, { replace: true });
+  };
+
+  // Update the active tab when URL changes (e.g., when user uses browser back/forward)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab");
+    if (
+      tabFromUrl &&
+      validTabs.includes(tabFromUrl) &&
+      tabFromUrl !== activeTab
+    ) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams, activeTab, validTabs]);
 
   // Initialize previousCharacterRef with the initial character data
   useEffect(() => {
@@ -247,15 +295,7 @@ const ShadowOfTheDemonLordSheet = ({
 
         {/* Tabs - improved for mobile */}
         <div className="flex border-b border-gray-200 overflow-x-auto whitespace-nowrap">
-          {[
-            "info",
-            "stats",
-            "weapons",
-            "paths",
-            "talents",
-            "spells",
-            "equipment",
-          ].map((tab) => (
+          {validTabs.map((tab) => (
             <button
               key={tab}
               className={`px-3 sm:px-6 py-3 text-sm sm:text-lg font-medium ${
@@ -263,9 +303,10 @@ const ShadowOfTheDemonLordSheet = ({
                   ? "text-blue-600 border-b-2 border-blue-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab.charAt(0).toUpperCase() +
+                tab.slice(1).replace(/([A-Z])/g, " $1")}
             </button>
           ))}
         </div>
@@ -327,6 +368,18 @@ const ShadowOfTheDemonLordSheet = ({
                 setCharacter({
                   ...character,
                   talents: updatedTalents,
+                });
+              }}
+            />
+          )}
+
+          {activeTab === "ancestryTraits" && (
+            <AncestryTraitsTab
+              ancestryTraits={character.ancestryTraits || []}
+              onChange={(updatedAncestryTraits) => {
+                setCharacter({
+                  ...character,
+                  ancestryTraits: updatedAncestryTraits,
                 });
               }}
             />

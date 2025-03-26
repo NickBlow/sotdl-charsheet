@@ -3,7 +3,7 @@ import { Trash2, Plus } from "lucide-react";
 const SpellsTab = ({ spells, onChange }) => {
   // Add a new spell
   const handleAddSpell = () => {
-    onChange([...spells, { name: "", level: 1, castings: 1 }]);
+    onChange([...spells, { name: "", level: 0, castings: 1, description: "" }]);
   };
 
   // Remove a spell
@@ -44,7 +44,7 @@ const SpellsTab = ({ spells, onChange }) => {
             key={index}
             className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Spell Name
@@ -58,25 +58,24 @@ const SpellsTab = ({ spells, onChange }) => {
                   }
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Level
                 </label>
                 <input
                   type="number"
+                  min="0"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  value={spell.level || 1}
+                  value={spell.level !== undefined ? spell.level : 0}
                   onChange={(e) =>
                     handleUpdateSpell(
                       index,
                       "level",
-                      parseInt(e.target.value) || 1
+                      parseInt(e.target.value) || 0
                     )
                   }
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Castings
@@ -102,6 +101,21 @@ const SpellsTab = ({ spells, onChange }) => {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Spell Description Field - added below the existing fields */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <textarea
+                className="w-full p-2 border border-gray-300 rounded-md"
+                rows={3}
+                value={spell.description || ""}
+                onChange={(e) =>
+                  handleUpdateSpell(index, "description", e.target.value)
+                }
+              />
             </div>
           </div>
         ))

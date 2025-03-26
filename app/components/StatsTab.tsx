@@ -1,5 +1,3 @@
-import React from "react";
-
 const StatsTab = ({ stats, onChange }) => {
   // Handle input changes
   const handleChange = (field, value) => {
@@ -23,6 +21,23 @@ const StatsTab = ({ stats, onChange }) => {
     onChange(updatedStats);
   };
 
+  // Available size options for the game system
+  const sizeOptions = [
+    { value: 0.125, label: "1/8" },
+    { value: 0.25, label: "1/4" },
+    { value: 0.5, label: "1/2" },
+    { value: 1, label: "1" },
+    { value: 2, label: "2" },
+    { value: 3, label: "3" },
+    { value: 4, label: "4" },
+    { value: 5, label: "5" },
+    { value: 6, label: "6" },
+    { value: 7, label: "7" },
+    { value: 8, label: "8" },
+    { value: 9, label: "9" },
+    { value: 10, label: "10" },
+  ];
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-6">Character Stats</h2>
@@ -32,14 +47,21 @@ const StatsTab = ({ stats, onChange }) => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Size
           </label>
-          <input
-            type="number"
+          <select
             className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
             value={stats.size}
-            onChange={(e) =>
-              handleChange("size", parseInt(e.target.value) || 0)
-            }
-          />
+            onChange={(e) => {
+              // Parse as float to support fractional values
+              const value = parseFloat(e.target.value);
+              handleChange("size", value);
+            }}
+          >
+            {sizeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
