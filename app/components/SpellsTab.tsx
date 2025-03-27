@@ -3,7 +3,10 @@ import { Trash2, Plus } from "lucide-react";
 const SpellsTab = ({ spells, onChange }) => {
   // Add a new spell
   const handleAddSpell = () => {
-    onChange([...spells, { name: "", level: 0, castings: 1, description: "" }]);
+    onChange([
+      ...spells,
+      { name: "", level: 0, castings: 1, description: "", tradition: "" },
+    ]);
   };
 
   // Remove a spell
@@ -44,7 +47,7 @@ const SpellsTab = ({ spells, onChange }) => {
             key={index}
             className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Spell Name
@@ -55,6 +58,19 @@ const SpellsTab = ({ spells, onChange }) => {
                   value={spell.name || ""}
                   onChange={(e) =>
                     handleUpdateSpell(index, "name", e.target.value)
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tradition
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={spell.tradition || ""}
+                  onChange={(e) =>
+                    handleUpdateSpell(index, "tradition", e.target.value)
                   }
                 />
               </div>
