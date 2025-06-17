@@ -395,8 +395,15 @@ const ShadowOfTheDemonLordSheet = ({
           {activeTab === "spells" && (
             <SpellsTab
               spells={character.spells}
+              incantations={character.equipment.incantations || []}
               onChange={(updatedSpells) =>
                 setCharacter({ ...character, spells: updatedSpells })
+              }
+              onIncantationsChange={(updated) =>
+                setCharacter({
+                  ...character,
+                  equipment: { ...character.equipment, incantations: updated },
+                })
               }
             />
           )}
