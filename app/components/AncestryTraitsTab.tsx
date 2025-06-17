@@ -50,7 +50,7 @@ const AncestryTraitsTab = ({ ancestryTraits, onChange }) => {
         ancestryTraits.map((trait, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
+            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
           >
             <div className="flex items-start">
               <div className="flex-1">
@@ -81,7 +81,7 @@ const AncestryTraitsTab = ({ ancestryTraits, onChange }) => {
                   }
                 />
               </div>
-              <div className="flex flex-col ml-2">
+              <div className="flex flex-col ml-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100">
                 <button
                   className="text-gray-500 hover:text-gray-700"
                   onClick={() => moveTrait(index, -1)}
@@ -96,7 +96,7 @@ const AncestryTraitsTab = ({ ancestryTraits, onChange }) => {
                 </button>
               </div>
               <button
-                className="ml-2 text-red-500 hover:text-red-700"
+                className="ml-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
                 onClick={() => handleRemoveAncestryTrait(index)}
               >
                 <Trash2 className="h-6 w-6" />

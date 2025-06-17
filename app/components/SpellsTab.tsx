@@ -54,7 +54,7 @@ const SpellsTab = ({ spells, onChange }) => {
         spells.map((spell, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
+            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-4">
               <div>
@@ -118,7 +118,7 @@ const SpellsTab = ({ spells, onChange }) => {
                       )
                     }
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col opacity-0 group-hover:opacity-100 focus-within:opacity-100">
                     <button
                       className="text-gray-500 hover:text-gray-700"
                       onClick={() => moveSpell(index, -1)}
@@ -133,7 +133,7 @@ const SpellsTab = ({ spells, onChange }) => {
                     </button>
                   </div>
                   <button
-                    className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
+                    className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
                     onClick={() => handleRemoveSpell(index)}
                   >
                     <Trash2 className="h-5 w-5" />

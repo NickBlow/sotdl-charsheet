@@ -1,6 +1,13 @@
 import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
-const EquipmentTab = ({ equipment, onChange }) => {
+const EquipmentTab = ({
+  equipment,
+  weapons,
+  armor,
+  onEquipmentChange,
+  onWeaponsChange,
+  onArmorChange,
+}) => {
   // Update currency
   const handleCurrencyChange = (currency, value) => {
     const updatedEquipment = {
@@ -10,7 +17,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
         [currency]: value,
       },
     };
-    onChange(updatedEquipment);
+    onEquipmentChange(updatedEquipment);
   };
 
   // Add a new item
@@ -19,7 +26,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
       ...equipment,
       items: [...equipment.items, { name: "" }],
     };
-    onChange(updatedEquipment);
+    onEquipmentChange(updatedEquipment);
   };
 
   // Remove an item
@@ -28,7 +35,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
       ...equipment,
       items: equipment.items.filter((_, i) => i !== index),
     };
-    onChange(updatedEquipment);
+    onEquipmentChange(updatedEquipment);
   };
 
   // Update an item
@@ -41,7 +48,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
       items: updatedItems,
     };
 
-    onChange(updatedEquipment);
+    onEquipmentChange(updatedEquipment);
   };
 
   // Move item up or down
@@ -51,7 +58,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
     const updatedItems = [...equipment.items];
     const [moved] = updatedItems.splice(index, 1);
     updatedItems.splice(newIndex, 0, moved);
-    onChange({ ...equipment, items: updatedItems });
+    onEquipmentChange({ ...equipment, items: updatedItems });
   };
 
   // ------------------
@@ -62,10 +69,10 @@ const EquipmentTab = ({ equipment, onChange }) => {
       ...equipment,
       incantations: [
         ...(equipment.incantations || []),
-        { name: "", castingNumber: 0, description: "" },
+        { name: "", description: "" },
       ],
     };
-    onChange(updated);
+    onEquipmentChange(updated);
   };
 
   const handleRemoveIncantation = (index) => {
@@ -73,13 +80,13 @@ const EquipmentTab = ({ equipment, onChange }) => {
       ...equipment,
       incantations: (equipment.incantations || []).filter((_, i) => i !== index),
     };
-    onChange(updated);
+    onEquipmentChange(updated);
   };
 
   const handleUpdateIncantation = (index, field, value) => {
     const list = [...(equipment.incantations || [])];
     list[index] = { ...list[index], [field]: value };
-    onChange({ ...equipment, incantations: list });
+    onEquipmentChange({ ...equipment, incantations: list });
   };
 
   const moveIncantation = (index, direction) => {
@@ -88,7 +95,65 @@ const EquipmentTab = ({ equipment, onChange }) => {
     if (newIndex < 0 || newIndex >= list.length) return;
     const [moved] = list.splice(index, 1);
     list.splice(newIndex, 0, moved);
-    onChange({ ...equipment, incantations: list });
+    onEquipmentChange({ ...equipment, incantations: list });
+  };
+
+  // ------------------
+  // Weapons helpers
+  // ------------------
+  const handleAddWeapon = () => {
+    onWeaponsChange([
+      ...weapons,
+      { name: "", modifier: 0, damage: "", properties: "" },
+    ]);
+  };
+
+  const moveWeapon = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= weapons.length) return;
+    const updated = [...weapons];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    onWeaponsChange(updated);
+  };
+
+  const handleRemoveWeapon = (index) => {
+    onWeaponsChange(weapons.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateWeapon = (index, field, value) => {
+    const updated = [...weapons];
+    updated[index] = { ...updated[index], [field]: value };
+    onWeaponsChange(updated);
+  };
+
+  // ------------------
+  // Armor helpers
+  // ------------------
+  const handleAddArmor = () => {
+    onArmorChange([
+      ...armor,
+      { name: "", rating: 0, properties: "" },
+    ]);
+  };
+
+  const moveArmor = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= armor.length) return;
+    const updated = [...armor];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    onArmorChange(updated);
+  };
+
+  const handleRemoveArmor = (index) => {
+    onArmorChange(armor.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateArmor = (index, field, value) => {
+    const updated = [...armor];
+    updated[index] = { ...updated[index], [field]: value };
+    onArmorChange(updated);
   };
 
   return (
@@ -175,7 +240,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
         equipment.items.map((item, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
+            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
           >
             <div className="flex items-center">
               <div className="flex-1">
@@ -189,7 +254,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
                   onChange={(e) => handleUpdateItem(index, e.target.value)}
                 />
               </div>
-              <div className="flex flex-col ml-2">
+              <div className="flex flex-col ml-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100">
                 <button
                   className="text-gray-500 hover:text-gray-700"
                   onClick={() => moveItem(index, -1)}
@@ -204,7 +269,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
                 </button>
               </div>
               <button
-                className="ml-2 text-red-500 hover:text-red-700"
+                className="ml-2 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
                 onClick={() => handleRemoveItem(index)}
               >
                 <Trash2 className="h-6 w-6" />
@@ -234,7 +299,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
         (equipment.incantations || []).map((inc, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
+            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <div>
@@ -246,15 +311,6 @@ const EquipmentTab = ({ equipment, onChange }) => {
                   onChange={(e) => handleUpdateIncantation(index, "name", e.target.value)}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Casting #</label>
-                <input
-                  type="number"
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={inc.castingNumber || 0}
-                  onChange={(e) => handleUpdateIncantation(index, "castingNumber", parseInt(e.target.value) || 0)}
-                />
-              </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
@@ -264,7 +320,7 @@ const EquipmentTab = ({ equipment, onChange }) => {
                   onChange={(e) => handleUpdateIncantation(index, "description", e.target.value)}
                 />
               </div>
-              <div className="flex items-start space-x-2">
+              <div className="flex items-start space-x-2 opacity-0 group-hover:opacity-100 focus-within:opacity-100">
                 <button className="text-gray-500 hover:text-gray-700" onClick={() => moveIncantation(index, -1)}>
                   <ArrowUp className="h-4 w-4" />
                 </button>
@@ -274,6 +330,145 @@ const EquipmentTab = ({ equipment, onChange }) => {
                 <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveIncantation(index)}>
                   <Trash2 className="h-5 w-5" />
                 </button>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      {/* Weapons */}
+      <div className="flex justify-between items-center mt-8 mb-6">
+        <h3 className="text-xl font-medium">Weapons</h3>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={handleAddWeapon}
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add Weapon
+        </button>
+      </div>
+
+      {weapons.length === 0 ? (
+        <div className="text-center py-12 text-gray-500 bg-white p-4 rounded-lg border border-gray-200">
+          No weapons added yet.
+        </div>
+      ) : (
+        weapons.map((weapon, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Weapon Name</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={weapon.name || ""}
+                  onChange={(e) => handleUpdateWeapon(index, "name", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Modifier</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={weapon.modifier || 0}
+                  onChange={(e) => handleUpdateWeapon(index, "modifier", parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Damage</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={weapon.damage || ""}
+                  onChange={(e) => handleUpdateWeapon(index, "damage", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Properties</label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 border border-gray-300 rounded-l-md"
+                    value={weapon.properties || ""}
+                    onChange={(e) => handleUpdateWeapon(index, "properties", e.target.value)}
+                  />
+                  <div className="flex flex-col opacity-0 group-hover:opacity-100 focus-within:opacity-100">
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveWeapon(index, -1)}>
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveWeapon(index, 1)}>
+                      <ArrowDown className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <button className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100" onClick={() => handleRemoveWeapon(index)}>
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      {/* Armor */}
+      <div className="flex justify-between items-center mt-8 mb-6">
+        <h3 className="text-xl font-medium">Armor</h3>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={handleAddArmor}
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add Armor
+        </button>
+      </div>
+
+      {armor.length === 0 ? (
+        <div className="text-center py-12 text-gray-500 bg-white p-4 rounded-lg border border-gray-200">
+          No armor added yet.
+        </div>
+      ) : (
+        armor.map((a, index) => (
+          <div key={index} className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Armor Name</label>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={a.name || ""}
+                  onChange={(e) => handleUpdateArmor(index, "name", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={a.rating || 0}
+                  onChange={(e) => handleUpdateArmor(index, "rating", parseInt(e.target.value) || 0)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Properties</label>
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 border border-gray-300 rounded-l-md"
+                    value={a.properties || ""}
+                    onChange={(e) => handleUpdateArmor(index, "properties", e.target.value)}
+                  />
+                  <div className="flex flex-col opacity-0 group-hover:opacity-100 focus-within:opacity-100">
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveArmor(index, -1)}>
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveArmor(index, 1)}>
+                      <ArrowDown className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <button className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100" onClick={() => handleRemoveArmor(index)}>
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
