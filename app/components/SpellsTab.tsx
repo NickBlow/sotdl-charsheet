@@ -1,4 +1,4 @@
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
 const SpellsTab = ({ spells, onChange }) => {
   // Add a new spell
@@ -24,6 +24,15 @@ const SpellsTab = ({ spells, onChange }) => {
     onChange(updatedSpells);
   };
 
+  const moveSpell = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= spells.length) return;
+    const updated = [...spells];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    onChange(updated);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
@@ -45,7 +54,7 @@ const SpellsTab = ({ spells, onChange }) => {
         spells.map((spell, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4"
+            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-4">
               <div>
@@ -96,7 +105,7 @@ const SpellsTab = ({ spells, onChange }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Castings
                 </label>
-                <div className="flex">
+                <div className="flex items-center">
                   <input
                     type="number"
                     className="flex-1 p-2 border border-gray-300 rounded-l-md"
@@ -109,8 +118,22 @@ const SpellsTab = ({ spells, onChange }) => {
                       )
                     }
                   />
+                  <div className="flex flex-col">
+                    <button
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => moveSpell(index, -1)}
+                    >
+                      <ArrowUp className="h-5 w-5" />
+                    </button>
+                    <button
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => moveSpell(index, 1)}
+                    >
+                      <ArrowDown className="h-5 w-5" />
+                    </button>
+                  </div>
                   <button
-                    className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600"
+                    className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
                     onClick={() => handleRemoveSpell(index)}
                   >
                     <Trash2 className="h-5 w-5" />

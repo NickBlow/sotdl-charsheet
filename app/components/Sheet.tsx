@@ -104,6 +104,7 @@ const ShadowOfTheDemonLordSheet = ({
         perceptionMod: 0,
       },
       weapons: [],
+      armor: [],
       paths: {
         novice: { name: "", details: "" },
         expert: { name: "", details: "" },
@@ -122,11 +123,15 @@ const ShadowOfTheDemonLordSheet = ({
           bits: 0,
         },
         items: [],
+        incantations: [],
       },
     };
 
     // ensure backwards compatibility fields
     (data as any).ancestryTraits = (data as any).ancestryTraits || [];
+    (data as any).equipment = (data as any).equipment || { currency: {}, items: [], incantations: [] };
+    (data as any).equipment.incantations = (data as any).equipment.incantations || [];
+    (data as any).armor = (data as any).armor || [];
 
     return data;
   });
@@ -167,6 +172,11 @@ const ShadowOfTheDemonLordSheet = ({
       const updated = {
         ...charData,
         ancestryTraits: charData.ancestryTraits || [],
+        equipment: {
+          ...charData.equipment,
+          incantations: charData.equipment?.incantations || [],
+        },
+        armor: charData.armor || [],
       };
 
       setCharacter(updated);
@@ -311,8 +321,10 @@ const ShadowOfTheDemonLordSheet = ({
               }`}
               onClick={() => handleTabChange(tab)}
             >
-              {tab.charAt(0).toUpperCase() +
-                tab.slice(1).replace(/([A-Z])/g, " $1")}
+              {tab === "weapons"
+                ? "Weapons and Armor"
+                : tab.charAt(0).toUpperCase() +
+                  tab.slice(1).replace(/([A-Z])/g, " $1")}
             </button>
           ))}
         </div>
@@ -340,8 +352,12 @@ const ShadowOfTheDemonLordSheet = ({
           {activeTab === "weapons" && (
             <WeaponsTab
               weapons={character.weapons}
-              onChange={(updatedWeapons) =>
+              armor={character.armor}
+              onWeaponsChange={(updatedWeapons) =>
                 setCharacter({ ...character, weapons: updatedWeapons })
+              }
+              onArmorChange={(updatedArmor) =>
+                setCharacter({ ...character, armor: updatedArmor })
               }
             />
           )}
@@ -388,8 +404,16 @@ const ShadowOfTheDemonLordSheet = ({
           {activeTab === "equipment" && (
             <EquipmentTab
               equipment={character.equipment}
-              onChange={(updatedEquipment) =>
-                setCharacter({ ...character, equipment: updatedEquipment })
+              weapons={character.weapons}
+              armor={character.armor}
+              onEquipmentChange={(updated) =>
+                setCharacter({ ...character, equipment: updated })
+              }
+              onWeaponsChange={(updated) =>
+                setCharacter({ ...character, weapons: updated })
+              }
+              onArmorChange={(updated) =>
+                setCharacter({ ...character, armor: updated })
               }
             />
           )}

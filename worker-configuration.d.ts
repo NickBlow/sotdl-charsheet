@@ -2,4 +2,5 @@
 
 interface Env {
 	VALUE_FROM_CLOUDFLARE: "Hello from Cloudflare";
+	SHEET_STORE: DurableObjectNamespace<import("./workers/app").SheetStore>;
 }
