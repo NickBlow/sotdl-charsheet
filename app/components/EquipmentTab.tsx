@@ -62,43 +62,6 @@ const EquipmentTab = ({
   };
 
   // ------------------
-  // Incantations
-  // ------------------
-  const handleAddIncantation = () => {
-    const updated = {
-      ...equipment,
-      incantations: [
-        ...(equipment.incantations || []),
-        { name: "", description: "" },
-      ],
-    };
-    onEquipmentChange(updated);
-  };
-
-  const handleRemoveIncantation = (index) => {
-    const updated = {
-      ...equipment,
-      incantations: (equipment.incantations || []).filter((_, i) => i !== index),
-    };
-    onEquipmentChange(updated);
-  };
-
-  const handleUpdateIncantation = (index, field, value) => {
-    const list = [...(equipment.incantations || [])];
-    list[index] = { ...list[index], [field]: value };
-    onEquipmentChange({ ...equipment, incantations: list });
-  };
-
-  const moveIncantation = (index, direction) => {
-    const list = [...(equipment.incantations || [])];
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= list.length) return;
-    const [moved] = list.splice(index, 1);
-    list.splice(newIndex, 0, moved);
-    onEquipmentChange({ ...equipment, incantations: list });
-  };
-
-  // ------------------
   // Weapons helpers
   // ------------------
   const handleAddWeapon = () => {
@@ -223,18 +186,11 @@ const EquipmentTab = ({
 
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-medium">Equipment</h3>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-          onClick={handleAddItem}
-        >
-          <Plus className="mr-1 h-4 w-4" />
-          Add Equipment
-        </button>
       </div>
 
       {equipment.items.length === 0 ? (
         <div className="text-center py-12 text-gray-500 bg-white p-4 rounded-lg border border-gray-200">
-          No equipment added yet. Click the button above to add one.
+          No equipment added yet.
         </div>
       ) : (
         equipment.items.map((item, index) => (
@@ -278,74 +234,20 @@ const EquipmentTab = ({
           </div>
         ))
       )}
-
-      {/* Incantations */}
-      <div className="flex justify-between items-center mt-8 mb-6">
-        <h3 className="text-xl font-medium">Incantations</h3>
+      <div className="flex justify-end mt-4">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-          onClick={handleAddIncantation}
+          onClick={handleAddItem}
         >
           <Plus className="mr-1 h-4 w-4" />
-          Add Incantation
+          Add Equipment
         </button>
       </div>
 
-      {(equipment.incantations || []).length === 0 ? (
-        <div className="text-center py-12 text-gray-500 bg-white p-4 rounded-lg border border-gray-200">
-          No incantations added yet.
-        </div>
-      ) : (
-        (equipment.incantations || []).map((inc, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={inc.name || ""}
-                  onChange={(e) => handleUpdateIncantation(index, "name", e.target.value)}
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  rows={2}
-                  value={inc.description || ""}
-                  onChange={(e) => handleUpdateIncantation(index, "description", e.target.value)}
-                />
-              </div>
-              <div className="flex items-start space-x-2">
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => moveIncantation(index, -1)}>
-                  <ArrowUp className="h-5 w-5" />
-                </button>
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => moveIncantation(index, 1)}>
-                  <ArrowDown className="h-5 w-5" />
-                </button>
-                <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveIncantation(index)}>
-                  <Trash2 className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
 
       {/* Weapons */}
       <div className="flex justify-between items-center mt-8 mb-6">
         <h3 className="text-xl font-medium">Weapons</h3>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-          onClick={handleAddWeapon}
-        >
-          <Plus className="mr-1 h-4 w-4" />
-          Add Weapon
-        </button>
       </div>
 
       {weapons.length === 0 ? (
@@ -409,17 +311,19 @@ const EquipmentTab = ({
           </div>
         ))
       )}
+      <div className="flex justify-end mt-4">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={handleAddWeapon}
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add Weapon
+        </button>
+      </div>
 
       {/* Armor */}
       <div className="flex justify-between items-center mt-8 mb-6">
         <h3 className="text-xl font-medium">Armor</h3>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-          onClick={handleAddArmor}
-        >
-          <Plus className="mr-1 h-4 w-4" />
-          Add Armor
-        </button>
       </div>
 
       {armor.length === 0 ? (
@@ -474,6 +378,15 @@ const EquipmentTab = ({
           </div>
         ))
       )}
+      <div className="flex justify-end mt-4">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
+          onClick={handleAddArmor}
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Add Armor
+        </button>
+      </div>
     </div>
   );
 };
