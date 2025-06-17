@@ -131,22 +131,22 @@ const WeaponsTab = ({ weapons, armor, onWeaponsChange, onArmorChange }) => {
                     handleUpdateWeapon(index, "properties", e.target.value)
                   }
                 />
-                <div className="flex flex-col opacity-0 group-hover:opacity-100 focus-within:opacity-100">
+                <div className="flex flex-col">
                   <button
                     className="text-gray-500 hover:text-gray-700"
                     onClick={() => moveWeapon(index, -1)}
                   >
-                    <ArrowUp className="h-4 w-4" />
+                    <ArrowUp className="h-5 w-5" />
                   </button>
                   <button
                     className="text-gray-500 hover:text-gray-700"
                     onClick={() => moveWeapon(index, 1)}
                   >
-                    <ArrowDown className="h-4 w-4" />
+                    <ArrowDown className="h-5 w-5" />
                   </button>
                 </div>
                 <button
-                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
                   onClick={() => handleRemoveWeapon(index)}
                 >
                   <Trash2 className="h-5 w-5" />
@@ -215,22 +215,22 @@ const WeaponsTab = ({ weapons, armor, onWeaponsChange, onArmorChange }) => {
                     handleUpdateArmor(index, "properties", e.target.value)
                   }
                 />
-                <div className="flex flex-col opacity-0 group-hover:opacity-100 focus-within:opacity-100">
+                <div className="flex flex-col">
                   <button
                     className="text-gray-500 hover:text-gray-700"
                     onClick={() => moveArmor(index, -1)}
                   >
-                    <ArrowUp className="h-4 w-4" />
+                    <ArrowUp className="h-5 w-5" />
                   </button>
                   <button
                     className="text-gray-500 hover:text-gray-700"
                     onClick={() => moveArmor(index, 1)}
                   >
-                    <ArrowDown className="h-4 w-4" />
+                    <ArrowDown className="h-5 w-5" />
                   </button>
                 </div>
                 <button
-                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
                   onClick={() => handleRemoveArmor(index)}
                 >
                   <Trash2 className="h-5 w-5" />
