@@ -1,4 +1,4 @@
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
 const WeaponsTab = ({ weapons, onChange }) => {
   // Add a new weapon
@@ -7,6 +7,15 @@ const WeaponsTab = ({ weapons, onChange }) => {
       ...weapons,
       { name: "", modifier: 0, damage: "", properties: "" },
     ]);
+  };
+
+  const moveWeapon = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= weapons.length) return;
+    const updated = [...weapons];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    onChange(updated);
   };
 
   // Remove a weapon
@@ -84,7 +93,7 @@ const WeaponsTab = ({ weapons, onChange }) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Properties
               </label>
-              <div className="flex">
+              <div className="flex items-center">
                 <input
                   type="text"
                   className="flex-1 p-2 border border-gray-300 rounded-l-md"
@@ -93,8 +102,22 @@ const WeaponsTab = ({ weapons, onChange }) => {
                     handleUpdateWeapon(index, "properties", e.target.value)
                   }
                 />
+                <div className="flex flex-col">
+                  <button
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => moveWeapon(index, -1)}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => moveWeapon(index, 1)}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </button>
+                </div>
                 <button
-                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600"
+                  className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
                   onClick={() => handleRemoveWeapon(index)}
                 >
                   <Trash2 className="h-5 w-5" />

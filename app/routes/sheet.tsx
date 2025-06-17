@@ -23,7 +23,7 @@ export function meta({ matches }: Route.MetaArgs) {
 
 export async function loader({ context, params }: Route.LoaderArgs) {
   const durableObjectId = context.cloudflare.env.SHEET_STORE.idFromName(
-    params.id || ""
+    (params as any).id || ""
   );
   const dObj = context.cloudflare.env.SHEET_STORE.get(durableObjectId);
   // @ts-ignore
@@ -33,7 +33,7 @@ export async function loader({ context, params }: Route.LoaderArgs) {
 export async function action({ request, params, context }: Route.ActionArgs) {
   let data = await request.json();
   const durableObjectId = context.cloudflare.env.SHEET_STORE.idFromName(
-    params.id || ""
+    (params as any).id || ""
   );
   const dObj = context.cloudflare.env.SHEET_STORE.get(durableObjectId);
   await dObj.saveData(data);

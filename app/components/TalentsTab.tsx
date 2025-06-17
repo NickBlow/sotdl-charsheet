@@ -1,4 +1,4 @@
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
 const TalentsTab = ({ talents, onChange }) => {
   // Add a new talent
@@ -19,6 +19,15 @@ const TalentsTab = ({ talents, onChange }) => {
       [field]: value,
     };
     onChange(updatedTalents);
+  };
+
+  const moveTalent = (index, direction) => {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= talents.length) return;
+    const updated = [...talents];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(newIndex, 0, moved);
+    onChange(updated);
   };
 
   return (
@@ -69,8 +78,22 @@ const TalentsTab = ({ talents, onChange }) => {
                   }
                 />
               </div>
+              <div className="flex flex-col ml-2">
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => moveTalent(index, -1)}
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </button>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => moveTalent(index, 1)}
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </button>
+              </div>
               <button
-                className="ml-4 text-red-500 hover:text-red-700"
+                className="ml-2 text-red-500 hover:text-red-700"
                 onClick={() => handleRemoveTalent(index)}
               >
                 <Trash2 className="h-6 w-6" />

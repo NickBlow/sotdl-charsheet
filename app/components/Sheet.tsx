@@ -122,11 +122,14 @@ const ShadowOfTheDemonLordSheet = ({
           bits: 0,
         },
         items: [],
+        incantations: [],
       },
     };
 
     // ensure backwards compatibility fields
     (data as any).ancestryTraits = (data as any).ancestryTraits || [];
+    (data as any).equipment = (data as any).equipment || { currency: {}, items: [], incantations: [] };
+    (data as any).equipment.incantations = (data as any).equipment.incantations || [];
 
     return data;
   });
@@ -167,6 +170,10 @@ const ShadowOfTheDemonLordSheet = ({
       const updated = {
         ...charData,
         ancestryTraits: charData.ancestryTraits || [],
+        equipment: {
+          ...charData.equipment,
+          incantations: charData.equipment?.incantations || [],
+        },
       };
 
       setCharacter(updated);
