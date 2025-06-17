@@ -1,3 +1,7 @@
+// ShadowOfTheDemonLordSheet.tsx
+// Updated to prevent unsaved edits from being overwritten by a background
+// re‑validation. Implements the “snapshot comparison” fix described.
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Save, Share2, Check } from "lucide-react";
 import InfoTab from "./InfoTab";
@@ -26,7 +30,21 @@ const ShadowOfTheDemonLordSheet = ({
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Define valid tabs
+  // ------------------
+  // Utilities & Refs
+  // ------------------
+  const previousCharacterRef = useRef<string | null>(null);
+  const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetcher = useFetcher();
+
+  // ------------------
+  // Toast state
+  // ------------------
+  const [showToast, setShowToast] = useState(false);
+
+  // ------------------
+  // Active tab logic (hash‑based)
+  // ------------------
   const validTabs = [
     "info",
     "stats",
@@ -36,22 +54,18 @@ const ShadowOfTheDemonLordSheet = ({
     "ancestryTraits",
     "spells",
     "equipment",
-  ];
+  ] as const;
 
-  // Get the active tab from URL params or from hash for better performance
-  // Using hash fragment for tab navigation has less overhead than search params
-  const tabFromHash = location.hash.slice(1); // Remove the # character
-  const activeTab = validTabs.includes(tabFromHash) ? tabFromHash : "info";
+  const tabFromHash = location.hash.slice(1); // remove leading '#'
+  const activeTab = validTabs.includes(tabFromHash as any)
+    ? tabFromHash
+    : "info";
 
-  const previousCharacterRef = useRef<string>(null!);
-  const autosaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  let fetcher = useFetcher();
-
-  // Add state for toast notification
-  const [showToast, setShowToast] = useState(false);
-
+  // ------------------
+  // Character state
+  // ------------------
   const [character, setCharacter] = useState(() => {
-    // Initialize with default character if no charData, otherwise use charData
+    // default structure used when there is no charData
     const data = charData || {
       info: {
         name: "",
@@ -111,114 +125,111 @@ const ShadowOfTheDemonLordSheet = ({
       },
     };
 
-    // Ensure ancestryTraits field exists (backward compatibility)
-    data.ancestryTraits = data.ancestryTraits || [];
+    // ensure backwards compatibility fields
+    (data as any).ancestryTraits = (data as any).ancestryTraits || [];
 
     return data;
   });
 
-  // Handle tab changes using URL hash for better performance
-  const handleTabChange = (tab) => {
-    // Update URL hash instead of search params
+  // ------------------
+  // Helpers
+  // ------------------
+  const handleTabChange = (tab: string) => {
     window.location.hash = tab;
   };
 
-  // Initialize previousCharacterRef with the initial character data
+  // ------------------
+  // Initial mount
+  // ------------------
   useEffect(() => {
-    console.log("Setting initial character reference");
     previousCharacterRef.current = JSON.stringify(character);
 
-    // Set the default tab to "info" if no tab is specified in the URL
+    // ensure URL has a hash so the tab styling is correct on first load
     if (!location.hash) {
       window.location.hash = "info";
     }
-  }, []);
+  }, []); // run once
 
-  // Update character state when charData changes from revalidation
+  // ---------------------------------------------------------------------------
+  // Re‑validation effect — replace local state only when server data differs
+  // *from the last-saved snapshot*, NOT from the potentially dirty state.
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (charData) {
-      const newDataString = JSON.stringify(charData);
-      const currentCharacterString = JSON.stringify(character);
+    if (!charData) return; // nothing new
 
-      // Only update if the data has actually changed and we're not in the middle of editing
-      // This check prevents overwriting user changes when data is reloaded
-      if (
-        newDataString !== currentCharacterString &&
-        fetcher.state === "idle"
-      ) {
-        console.log("Updating character from revalidated data");
+    const newDataString = JSON.stringify(charData);
+    const lastSavedSnapshot = previousCharacterRef.current;
 
-        // Ensure charData has ancestryTraits field
-        const updatedCharData = {
-          ...charData,
-          ancestryTraits: charData.ancestryTraits || [],
-        };
+    if (
+      lastSavedSnapshot !== newDataString && // **compare with snapshot**
+      fetcher.state === "idle" // don't interfere while submitting
+    ) {
+      const updated = {
+        ...charData,
+        ancestryTraits: charData.ancestryTraits || [],
+      };
 
-        setCharacter(updatedCharData);
-        previousCharacterRef.current = JSON.stringify(updatedCharData);
-      }
+      setCharacter(updated);
+      previousCharacterRef.current = newDataString; // update snapshot
     }
   }, [charData, fetcher.state]);
 
-  // Setup window focus listener to revalidate data
+  // ---------------------------------------------------------------------------
+  // Track when the POST round‑trip finishes so we can record the snapshot of
+  // what the server now knows as the latest saved character.
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    // Function to handle window focus
+    if (fetcher.state === "idle" && charData) {
+      previousCharacterRef.current = JSON.stringify(charData);
+    }
+  }, [fetcher.state, charData]);
+
+  // ------------------
+  // Window focus → revalidate
+  // ------------------
+  useEffect(() => {
     const handleWindowFocus = () => {
-      console.log("Window focused - revalidating data from server");
       revalidator.revalidate();
     };
 
-    // Add event listener
     window.addEventListener("focus", handleWindowFocus);
-
-    // Cleanup function
-    return () => {
-      window.removeEventListener("focus", handleWindowFocus);
-    };
+    return () => window.removeEventListener("focus", handleWindowFocus);
   }, [revalidator]);
 
-  // Save character data function
+  // ------------------
+  // Save (manual OR autosave) – snapshot update happens after round‑trip.
+  // ------------------
   const saveCharacter = useCallback(() => {
-    console.log("Saving character data...");
     fetcher.submit(JSON.stringify(character), {
       method: "post",
       encType: "application/json",
     });
-
-    // After saving, update the previous character reference
-    previousCharacterRef.current = JSON.stringify(character);
-    console.log("Previous character reference updated after save");
+    // no snapshot update here – wait for server confirmation
   }, [character, fetcher]);
 
-  // Check if character has changed and trigger autosave
+  // ------------------
+  // Autosave detector
+  // ------------------
   useEffect(() => {
-    // Convert character to string for comparison
     const currentCharacterString = JSON.stringify(character);
 
-    // Skip initial render or when character is not yet initialized
     if (!previousCharacterRef.current) {
       previousCharacterRef.current = currentCharacterString;
       return;
     }
 
-    // Only trigger autosave if the character has actually changed
     if (previousCharacterRef.current !== currentCharacterString) {
-      console.log("Character changed, scheduling autosave...");
-
-      // Clear any existing timeout to prevent multiple saves
+      // schedule/refresh autosave timer
       if (autosaveTimeoutRef.current) {
         clearTimeout(autosaveTimeoutRef.current);
       }
 
-      // Set a timeout for autosave
       autosaveTimeoutRef.current = setTimeout(() => {
-        console.log("Executing autosave...");
         saveCharacter();
         autosaveTimeoutRef.current = null;
       }, 3000);
     }
 
-    // Cleanup function to clear the timeout when component unmounts or effect reruns
     return () => {
       if (autosaveTimeoutRef.current) {
         clearTimeout(autosaveTimeoutRef.current);
@@ -226,37 +237,28 @@ const ShadowOfTheDemonLordSheet = ({
     };
   }, [character, saveCharacter]);
 
-  // Create a new character
-  const handleNewCharacter = () => {
-    navigate("/");
-  };
+  // ------------------
+  // Navigation helpers
+  // ------------------
+  const handleNewCharacter = () => navigate("/");
 
-  // Handle share button click
   const handleShare = () => {
-    // Get the current URL
-    const currentUrl = window.location.href;
-
-    // Copy to clipboard
     navigator.clipboard
-      .writeText(currentUrl)
+      .writeText(window.location.href)
       .then(() => {
-        // Show toast notification
         setShowToast(true);
-
-        // Hide toast after 3 seconds
-        setTimeout(() => {
-          setShowToast(false);
-        }, 3000);
+        setTimeout(() => setShowToast(false), 3000);
       })
-      .catch((error) => {
-        console.error("Error copying to clipboard:", error);
-      });
+      .catch(console.error);
   };
 
+  // ------------------
+  // Render
+  // ------------------
   return (
     <div className="bg-gray-50 min-h-screen p-4">
       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header with buttons - improved for mobile */}
+        {/* Header */}
         <div className="p-4 flex flex-col sm:flex-row justify-between items-center border-b border-gray-200 gap-4">
           <div>
             <button
@@ -266,11 +268,12 @@ const ShadowOfTheDemonLordSheet = ({
               New Character
             </button>
           </div>
+
           <div className="flex flex-col sm:flex-row items-center gap-2">
             <div className="flex items-center">
               <span className="text-green-600 text-sm">
-                {fetcher.state !== "idle" ? "Saving..." : ""}
-                {revalidator.state !== "idle" ? "Refreshing..." : ""}
+                {fetcher.state !== "idle" ? "Saving…" : ""}
+                {revalidator.state !== "idle" ? "Refreshing…" : ""}
               </span>
               {charData?.lastSaved && (
                 <span className="text-gray-500 text-sm ml-2 hidden sm:inline">
@@ -278,26 +281,25 @@ const ShadowOfTheDemonLordSheet = ({
                 </span>
               )}
             </div>
+
             <div className="flex gap-2">
               <button
                 className="bg-blue-600 text-white px-3 py-2 rounded-md flex items-center"
                 onClick={saveCharacter}
               >
-                <Save className="mr-1 h-4 w-4" />
-                Save
+                <Save className="mr-1 h-4 w-4" /> Save
               </button>
               <button
                 className="bg-gray-600 text-white px-3 py-2 rounded-md flex items-center"
                 onClick={handleShare}
               >
-                <Share2 className="mr-1 h-4 w-4" />
-                Share
+                <Share2 className="mr-1 h-4 w-4" /> Share
               </button>
             </div>
           </div>
         </div>
 
-        {/* Tabs - improved for mobile */}
+        {/* Tabs */}
         <div className="flex border-b border-gray-200 overflow-x-auto whitespace-nowrap">
           {validTabs.map((tab) => (
             <button
@@ -315,111 +317,89 @@ const ShadowOfTheDemonLordSheet = ({
           ))}
         </div>
 
-        {/* Content Area */}
+        {/* Content */}
         <div className="p-6">
           {activeTab === "info" && (
             <InfoTab
               info={character.info}
-              onChange={(updatedInfo) => {
-                setCharacter({
-                  ...character,
-                  info: updatedInfo,
-                });
-              }}
+              onChange={(updatedInfo) =>
+                setCharacter({ ...character, info: updatedInfo })
+              }
             />
           )}
 
           {activeTab === "stats" && (
             <StatsTab
               stats={character.stats}
-              onChange={(updatedStats) => {
-                setCharacter({
-                  ...character,
-                  stats: updatedStats,
-                });
-              }}
+              onChange={(updatedStats) =>
+                setCharacter({ ...character, stats: updatedStats })
+              }
             />
           )}
 
           {activeTab === "weapons" && (
             <WeaponsTab
               weapons={character.weapons}
-              onChange={(updatedWeapons) => {
-                setCharacter({
-                  ...character,
-                  weapons: updatedWeapons,
-                });
-              }}
+              onChange={(updatedWeapons) =>
+                setCharacter({ ...character, weapons: updatedWeapons })
+              }
             />
           )}
 
           {activeTab === "paths" && (
             <PathsTab
               paths={character.paths}
-              onChange={(updatedPaths) => {
-                setCharacter({
-                  ...character,
-                  paths: updatedPaths,
-                });
-              }}
+              onChange={(updatedPaths) =>
+                setCharacter({ ...character, paths: updatedPaths })
+              }
             />
           )}
 
           {activeTab === "talents" && (
             <TalentsTab
               talents={character.talents}
-              onChange={(updatedTalents) => {
-                setCharacter({
-                  ...character,
-                  talents: updatedTalents,
-                });
-              }}
+              onChange={(updatedTalents) =>
+                setCharacter({ ...character, talents: updatedTalents })
+              }
             />
           )}
 
           {activeTab === "ancestryTraits" && (
             <AncestryTraitsTab
               ancestryTraits={character.ancestryTraits || []}
-              onChange={(updatedAncestryTraits) => {
+              onChange={(updatedAncestryTraits) =>
                 setCharacter({
                   ...character,
                   ancestryTraits: updatedAncestryTraits,
-                });
-              }}
+                })
+              }
             />
           )}
 
           {activeTab === "spells" && (
             <SpellsTab
               spells={character.spells}
-              onChange={(updatedSpells) => {
-                setCharacter({
-                  ...character,
-                  spells: updatedSpells,
-                });
-              }}
+              onChange={(updatedSpells) =>
+                setCharacter({ ...character, spells: updatedSpells })
+              }
             />
           )}
 
           {activeTab === "equipment" && (
             <EquipmentTab
               equipment={character.equipment}
-              onChange={(updatedEquipment) => {
-                setCharacter({
-                  ...character,
-                  equipment: updatedEquipment,
-                });
-              }}
+              onChange={(updatedEquipment) =>
+                setCharacter({ ...character, equipment: updatedEquipment })
+              }
             />
           )}
         </div>
       </div>
 
-      {/* Toast Notification - better positioning for mobile */}
+      {/* Toast */}
       {showToast && (
         <div className="fixed bottom-4 left-4 sm:left-auto sm:right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg flex items-center z-50">
-          <Check className="mr-2 h-4 w-4" />
-          Copied!
+          <Check className="mr-2 h-4 w-4" /> Copied!
         </div>
       )}
     </div>
