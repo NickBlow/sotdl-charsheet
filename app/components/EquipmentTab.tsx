@@ -193,46 +193,41 @@ const EquipmentTab = ({
           No equipment added yet.
         </div>
       ) : (
-        equipment.items.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 rounded-lg border border-gray-200 mb-4 group"
-          >
-            <div className="flex items-center">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Item Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={item.name || ""}
-                  onChange={(e) => handleUpdateItem(index, e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col ml-2">
-                <button
-                  className="text-gray-500 hover:text-gray-700"
-                  onClick={() => moveItem(index, -1)}
-                >
-                  <ArrowUp className="h-5 w-5" />
-                </button>
-                <button
-                  className="text-gray-500 hover:text-gray-700"
-                  onClick={() => moveItem(index, 1)}
-                >
-                  <ArrowDown className="h-5 w-5" />
-                </button>
-              </div>
-              <button
-                className="ml-2 text-red-500 hover:text-red-700"
-                onClick={() => handleRemoveItem(index)}
-              >
-                <Trash2 className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-        ))
+        <table className="min-w-full border border-gray-200 bg-white rounded-lg text-sm">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-2 py-1 text-left font-medium text-gray-700">Item Name</th>
+              <th className="px-2 py-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {equipment.items.map((item, index) => (
+              <tr key={index} className="border-t border-gray-200">
+                <td className="px-2 py-1">
+                  <input
+                    type="text"
+                    className="w-full p-1 border border-gray-300 rounded-md"
+                    value={item.name || ""}
+                    onChange={(e) => handleUpdateItem(index, e.target.value)}
+                  />
+                </td>
+                <td className="px-2 py-1 whitespace-nowrap">
+                  <div className="flex items-center space-x-1">
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveItem(index, -1)}>
+                      <ArrowUp className="h-4 w-4" />
+                    </button>
+                    <button className="text-gray-500 hover:text-gray-700" onClick={() => moveItem(index, 1)}>
+                      <ArrowDown className="h-4 w-4" />
+                    </button>
+                    <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveItem(index)}>
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
       <div className="flex justify-end mt-4">
         <button
