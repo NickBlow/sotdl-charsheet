@@ -67,7 +67,7 @@ const EquipmentTab = ({
   const handleAddWeapon = () => {
     onWeaponsChange([
       ...weapons,
-      { name: "", modifier: 0, damage: "", properties: "" },
+      { name: "", modifier: 0, damage: "", properties: "", description: "" },
     ]);
   };
 
@@ -301,10 +301,24 @@ const EquipmentTab = ({
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
-              </div>
+            </div>
+            {/* Weapon description/notes */}
+            <div className="mt-4 md:col-span-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Notes
+              </label>
+              <textarea
+                className="w-full p-2 border border-gray-300 rounded-md"
+                rows={3}
+                value={weapon.description || ""}
+                onChange={(e) =>
+                  handleUpdateWeapon(index, "description", e.target.value)
+                }
+              />
             </div>
           </div>
-        ))
+        </div>
+      ))
       )}
       <div className="flex justify-end mt-4">
         <button

@@ -5,7 +5,7 @@ const WeaponsTab = ({ weapons, armor, onWeaponsChange, onArmorChange }) => {
   const handleAddWeapon = () => {
     onWeaponsChange([
       ...weapons,
-      { name: "", modifier: 0, damage: "", properties: "" },
+      { name: "", modifier: 0, damage: "", properties: "", description: "" },
     ]);
   };
 
@@ -153,6 +153,20 @@ const WeaponsTab = ({ weapons, armor, onWeaponsChange, onArmorChange }) => {
                 </button>
               </div>
             </div>
+          </div>
+          {/* Weapon description/notes */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Notes
+            </label>
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded-md"
+              rows={3}
+              value={weapon.description || ""}
+              onChange={(e) =>
+                handleUpdateWeapon(index, "description", e.target.value)
+              }
+            />
           </div>
         </div>
       ))}
