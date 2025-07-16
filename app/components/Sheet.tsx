@@ -88,6 +88,7 @@ const ShadowOfTheDemonLordSheet = ({
         healingRate: 0,
         defense: 0,
         fortune: 0,
+        fatePoints: 0,
         power: 0,
         corruption: 0,
         insanity: 0,

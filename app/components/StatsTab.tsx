@@ -137,18 +137,34 @@ const StatsTab = ({ stats, onChange }) => {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Fortune
-        </label>
-        <input
-          type="number"
-          className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
-          value={stats.fortune}
-          onChange={(e) =>
-            handleChange("fortune", parseInt(e.target.value) || 0)
-          }
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Fortune
+          </label>
+          <input
+            type="number"
+            className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+            value={stats.fortune}
+            onChange={(e) =>
+              handleChange("fortune", parseInt(e.target.value) || 0)
+            }
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Fate Points
+          </label>
+          <input
+            type="number"
+            className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+            value={stats.fatePoints}
+            onChange={(e) =>
+              handleChange("fatePoints", parseInt(e.target.value) || 0)
+            }
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
