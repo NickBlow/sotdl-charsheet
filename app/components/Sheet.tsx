@@ -3,7 +3,7 @@
 // re‑validation. Implements the “snapshot comparison” fix described.
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Save, Share2, Check } from "lucide-react";
+import { Save, Share2, Check, Clipboard } from "lucide-react";
 import InfoTab from "./InfoTab";
 import StatsTab from "./StatsTab";
 import WeaponsTab from "./WeaponsTab";
@@ -41,6 +41,8 @@ const ShadowOfTheDemonLordSheet = ({
   // Toast state
   // ------------------
   const [showToast, setShowToast] = useState(false);
+  const [showScriptDialog, setShowScriptDialog] = useState(false);
+  const [scriptText, setScriptText] = useState("");
 
   // ------------------
   // Active tab logic (hash‑based)
@@ -263,6 +265,30 @@ const ShadowOfTheDemonLordSheet = ({
       .catch(console.error);
   };
 
+  const handleCopyScript = () => {
+    const { info, stats } = character as any;
+    const sheetUrl = `${window.location.origin}${window.location.pathname}#info`;
+    const script = `Sage! Pc update name="${info.name}" level=${info.level} damage=${stats.damage} health=${stats.health} insanity=${stats.insanity} corruption=${stats.corruption} defense=${stats.defense} speed=${stats.speed} power=${stats.power} size=${stats.size} fate=${stats.fatePoints} str=${stats.strength} agi=${stats.agility} int=${stats.intellect} will=${stats.will} perc=${stats.perception} sheet.url="${sheetUrl}"
+customsheet.template="**Level** {level}
+**Damage** {damage}; **Health** {health}; **Insanity** {insanity}; **Corruption** {corruption}
+{stats.template}
+**Defense** {defense}; **Speed** {speed}; **Power** {power}
+**Size** {Size}; **Fate** {fate}
+**Character sheet** {sheet.url}"
+customsheet.template.title=Stats
+displayname.template="{Name} | ᴅᴍɢ:{damage}⁄{health} | ᴅᴇꜰ:{defense}"
+stats.template="**Strength** {str}; **Agility** {agi}; **Intellect** {int}; **Will** {will}; **Perception** {perc}"`;
+    navigator.clipboard
+      .writeText(script)
+      .then(() => {
+        setScriptText(script);
+        setShowScriptDialog(true);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+      })
+      .catch(console.error);
+  };
+
   // ------------------
   // Render
   // ------------------
@@ -299,6 +325,12 @@ const ShadowOfTheDemonLordSheet = ({
                 onClick={saveCharacter}
               >
                 <Save className="mr-1 h-4 w-4" /> Save
+              </button>
+              <button
+                className="bg-gray-600 text-white px-3 py-2 rounded-md flex items-center"
+                onClick={handleCopyScript}
+              >
+                <Clipboard className="mr-1 h-4 w-4" /> Macro
               </button>
               <button
                 className="bg-gray-600 text-white px-3 py-2 rounded-md flex items-center"
@@ -427,6 +459,27 @@ const ShadowOfTheDemonLordSheet = ({
           )}
         </div>
       </div>
+
+      {showScriptDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-md shadow-lg max-w-2xl w-full">
+            <h3 className="text-lg font-bold mb-2">Sage Update Macro</h3>
+            <textarea
+              className="w-full h-40 p-2 border border-gray-300 rounded-md bg-white text-black text-sm"
+              readOnly
+              value={scriptText}
+            />
+            <div className="mt-4 text-right">
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                onClick={() => setShowScriptDialog(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       {showToast && (
