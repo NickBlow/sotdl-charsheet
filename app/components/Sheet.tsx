@@ -265,7 +265,7 @@ const ShadowOfTheDemonLordSheet = ({
       .catch(console.error);
   };
 
-  const handleCopyScript = () => {
+  const handleShowMacroDialog = () => {
     const { info, stats } = character as any;
     const sheetUrl = `${window.location.origin}${window.location.pathname}#info`;
     const script = `Sage! Pc update name="${info.name}" level=${info.level} damage=${stats.damage} health=${stats.health} insanity=${stats.insanity} corruption=${stats.corruption} defense=${stats.defense} speed=${stats.speed} power=${stats.power} size=${stats.size} fate=${stats.fatePoints} str=${stats.strength} agi=${stats.agility} int=${stats.intellect} will=${stats.will} perc=${stats.perception} sheet.url="${sheetUrl}"
@@ -278,11 +278,14 @@ customsheet.template="**Level** {level}
 customsheet.template.title=Stats
 displayname.template="{Name} | ᴅᴍɢ:{damage}⁄{health} | ᴅᴇꜰ:{defense}"
 stats.template="**Strength** {str}; **Agility** {agi}; **Intellect** {int}; **Will** {will}; **Perception** {perc}"`;
+    setScriptText(script);
+    setShowScriptDialog(true);
+  };
+
+  const handleCopyMacro = () => {
     navigator.clipboard
-      .writeText(script)
+      .writeText(scriptText)
       .then(() => {
-        setScriptText(script);
-        setShowScriptDialog(true);
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
       })
@@ -328,7 +331,7 @@ stats.template="**Strength** {str}; **Agility** {agi}; **Intellect** {int}; **Wi
               </button>
               <button
                 className="bg-gray-600 text-white px-3 py-2 rounded-md flex items-center"
-                onClick={handleCopyScript}
+                onClick={handleShowMacroDialog}
               >
                 <Clipboard className="mr-1 h-4 w-4" /> Macro
               </button>
@@ -469,7 +472,13 @@ stats.template="**Strength** {str}; **Agility** {agi}; **Intellect** {int}; **Wi
               readOnly
               value={scriptText}
             />
-            <div className="mt-4 text-right">
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center"
+                onClick={handleCopyMacro}
+              >
+                <Clipboard className="mr-1 h-4 w-4" /> Copy
+              </button>
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded-md"
                 onClick={() => setShowScriptDialog(false)}
