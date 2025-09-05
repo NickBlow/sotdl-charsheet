@@ -12,6 +12,7 @@ import TalentsTab from "./TalentsTab";
 import AncestryTraitsTab from "./AncestryTraitsTab";
 import SpellsTab from "./SpellsTab";
 import EquipmentTab from "./EquipmentTab";
+import CompanionsTab from "./CompanionsTab";
 import {
   useFetcher,
   useNavigate,
@@ -56,6 +57,7 @@ const ShadowOfTheDemonLordSheet = ({
     "ancestryTraits",
     "spells",
     "equipment",
+    "companions",
   ] as const;
 
   const tabFromHash = location.hash.slice(1); // remove leading '#'
@@ -118,6 +120,7 @@ const ShadowOfTheDemonLordSheet = ({
       },
       talents: [],
       spells: [],
+      companions: [],
       equipment: {
         currency: {
           gc: 0,
@@ -132,6 +135,7 @@ const ShadowOfTheDemonLordSheet = ({
 
     // ensure backwards compatibility fields
     (data as any).ancestryTraits = (data as any).ancestryTraits || [];
+    (data as any).companions = (data as any).companions || [];
     (data as any).equipment = (data as any).equipment || { currency: {}, items: [], incantations: [] };
     (data as any).equipment.incantations = (data as any).equipment.incantations || [];
     (data as any).armor = (data as any).armor || [];
@@ -175,6 +179,7 @@ const ShadowOfTheDemonLordSheet = ({
       const updated = {
         ...charData,
         ancestryTraits: charData.ancestryTraits || [],
+        companions: charData.companions || [],
         equipment: {
           ...charData.equipment,
           incantations: charData.equipment?.incantations || [],
@@ -457,6 +462,15 @@ stats.template="**Strength** {str}; **Agility** {agi}; **Intellect** {int}; **Wi
               }
               onArmorChange={(updated) =>
                 setCharacter({ ...character, armor: updated })
+              }
+            />
+          )}
+
+          {activeTab === "companions" && (
+            <CompanionsTab
+              companions={character.companions || []}
+              onChange={(updatedCompanions) =>
+                setCharacter({ ...character, companions: updatedCompanions })
               }
             />
           )}
