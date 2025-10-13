@@ -48,6 +48,22 @@ const CompanionsTab = ({ companions, onChange }) => {
     onChange(updated);
   };
 
+  const sizeOptions = [
+    { value: 0.125, label: "1/8" },
+    { value: 0.25, label: "1/4" },
+    { value: 0.5, label: "1/2" },
+    { value: 1, label: "1" },
+    { value: 2, label: "2" },
+    { value: 3, label: "3" },
+    { value: 4, label: "4" },
+    { value: 5, label: "5" },
+    { value: 6, label: "6" },
+    { value: 7, label: "7" },
+    { value: 8, label: "8" },
+    { value: 9, label: "9" },
+    { value: 10, label: "10" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
@@ -130,18 +146,24 @@ const CompanionsTab = ({ companions, onChange }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Size
                 </label>
-                <input
-                  type="number"
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  value={companion.size || 1}
-                  onChange={(e) =>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+                  value={companion.size ?? 1}
+                  onChange={(e) => {
+                    const parsedValue = parseFloat(e.target.value);
                     handleUpdateCompanion(
                       index,
                       "size",
-                      parseInt(e.target.value) || 1
-                    )
-                  }
-                />
+                      Number.isFinite(parsedValue) ? parsedValue : 1
+                    );
+                  }}
+                >
+                  {sizeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
