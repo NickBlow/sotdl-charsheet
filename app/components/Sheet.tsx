@@ -83,6 +83,7 @@ const ShadowOfTheDemonLordSheet = ({
         lifestyle: "",
         description: "",
         notes: "",
+        adventures: [],
       },
       stats: {
         size: 1,
@@ -178,6 +179,10 @@ const ShadowOfTheDemonLordSheet = ({
     ) {
       const updated = {
         ...charData,
+        info: {
+          ...charData.info,
+          adventures: charData.info?.adventures || [],
+        },
         ancestryTraits: charData.ancestryTraits || [],
         companions: charData.companions || [],
         equipment: {
