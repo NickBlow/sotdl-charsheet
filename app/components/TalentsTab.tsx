@@ -3,7 +3,10 @@ import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 const TalentsTab = ({ talents, onChange }) => {
   // Add a new talent
   const handleAddTalent = () => {
-    onChange([...talents, { name: "", description: "" }]);
+    onChange([
+      ...talents,
+      { name: "", description: "", usesCurrent: 0, usesMax: 0 },
+    ]);
   };
 
   // Remove a talent
@@ -55,17 +58,67 @@ const TalentsTab = ({ talents, onChange }) => {
           >
             <div className="flex items-start">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Talent Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-gray-300 rounded-md mb-2"
-                  value={talent.name || ""}
-                  onChange={(e) =>
-                    handleUpdateTalent(index, "name", e.target.value)
-                  }
-                />
+                <div className="flex flex-col sm:flex-row sm:items-end sm:gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Talent Name
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md mb-2 sm:mb-0"
+                      value={talent.name || ""}
+                      onChange={(e) =>
+                        handleUpdateTalent(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="hidden sm:block shrink-0">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Uses
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-24 p-2 border border-gray-300 rounded-md"
+                        value={
+                          Number.isFinite(talent.usesCurrent)
+                            ? talent.usesCurrent
+                            : 0
+                        }
+                        onChange={(e) =>
+                          handleUpdateTalent(
+                            index,
+                            "usesCurrent",
+                            Math.max(
+                              0,
+                              parseInt(e.target.value || "0", 10) || 0
+                            )
+                          )
+                        }
+                      />
+                      <span className="text-gray-500">/</span>
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-24 p-2 border border-gray-300 rounded-md"
+                        value={
+                          Number.isFinite(talent.usesMax) ? talent.usesMax : 0
+                        }
+                        onChange={(e) =>
+                          handleUpdateTalent(
+                            index,
+                            "usesMax",
+                            Math.max(
+                              0,
+                              parseInt(e.target.value || "0", 10) || 0
+                            )
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
                 </label>
@@ -77,6 +130,46 @@ const TalentsTab = ({ talents, onChange }) => {
                     handleUpdateTalent(index, "description", e.target.value)
                   }
                 />
+                <div className="mt-3 sm:hidden">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Uses
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-24 p-2 border border-gray-300 rounded-md"
+                      value={
+                        Number.isFinite(talent.usesCurrent)
+                          ? talent.usesCurrent
+                          : 0
+                      }
+                      onChange={(e) =>
+                        handleUpdateTalent(
+                          index,
+                          "usesCurrent",
+                          Math.max(0, parseInt(e.target.value || "0", 10) || 0)
+                        )
+                      }
+                    />
+                    <span className="text-gray-500">/</span>
+                    <input
+                      type="number"
+                      min={0}
+                      className="w-24 p-2 border border-gray-300 rounded-md"
+                      value={
+                        Number.isFinite(talent.usesMax) ? talent.usesMax : 0
+                      }
+                      onChange={(e) =>
+                        handleUpdateTalent(
+                          index,
+                          "usesMax",
+                          Math.max(0, parseInt(e.target.value || "0", 10) || 0)
+                        )
+                      }
+                    />
+                  </div>
+                </div>
               </div>
               <div className="flex flex-col ml-2">
                 <button
