@@ -46,7 +46,7 @@ const ShadowOfTheDemonLordSheet = ({
   const [scriptText, setScriptText] = useState("");
 
   // ------------------
-  // Active tab logic (hash‑based)
+  // Active tab logic (query‑based)
   // ------------------
   const validTabs = [
     "info",
@@ -60,9 +60,9 @@ const ShadowOfTheDemonLordSheet = ({
     "companions",
   ] as const;
 
-  const tabFromHash = location.hash.slice(1); // remove leading '#'
-  const activeTab = validTabs.includes(tabFromHash as any)
-    ? tabFromHash
+  const tabFromQuery = searchParams.get("tab");
+  const activeTab = validTabs.includes((tabFromQuery as any) || "")
+    ? (tabFromQuery as (typeof validTabs)[number])
     : "info";
 
   // ------------------
@@ -137,8 +137,13 @@ const ShadowOfTheDemonLordSheet = ({
     // ensure backwards compatibility fields
     (data as any).ancestryTraits = (data as any).ancestryTraits || [];
     (data as any).companions = (data as any).companions || [];
-    (data as any).equipment = (data as any).equipment || { currency: {}, items: [], incantations: [] };
-    (data as any).equipment.incantations = (data as any).equipment.incantations || [];
+    (data as any).equipment = (data as any).equipment || {
+      currency: {},
+      items: [],
+      incantations: [],
+    };
+    (data as any).equipment.incantations =
+      (data as any).equipment.incantations || [];
     (data as any).armor = (data as any).armor || [];
 
     return data;
@@ -148,7 +153,11 @@ const ShadowOfTheDemonLordSheet = ({
   // Helpers
   // ------------------
   const handleTabChange = (tab: string) => {
-    window.location.hash = tab;
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("tab", tab);
+      return next;
+    });
   };
 
   // ------------------
@@ -157,10 +166,7 @@ const ShadowOfTheDemonLordSheet = ({
   useEffect(() => {
     previousCharacterRef.current = JSON.stringify(character);
 
-    // ensure URL has a hash so the tab styling is correct on first load
-    if (!location.hash) {
-      window.location.hash = "info";
-    }
+    // no-op: we no longer force a hash; query param is optional and defaults to "info"
   }, []); // run once
 
   // ---------------------------------------------------------------------------
@@ -277,7 +283,7 @@ const ShadowOfTheDemonLordSheet = ({
 
   const handleShowMacroDialog = () => {
     const { info, stats } = character as any;
-    const sheetUrl = `${window.location.origin}${window.location.pathname}#info`;
+    const sheetUrl = `${window.location.origin}${window.location.pathname}?tab=info`;
     const script = `Sage! Pc update name="${info.name}" level=${info.level} damage=${stats.damage} health=${stats.health} insanity=${stats.insanity} corruption=${stats.corruption} defense=${stats.defense} speed=${stats.speed} power=${stats.power} size=${stats.size} fate=${stats.fatePoints} str=${stats.strength} agi=${stats.agility} int=${stats.intellect} will=${stats.will} perc=${stats.perception} sheet.url="${sheetUrl}"
 customsheet.template="**Level** {level}
 **Damage** {damage}; **Health** {health}; **Insanity** {insanity}; **Corruption** {corruption}
