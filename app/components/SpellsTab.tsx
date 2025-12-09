@@ -1,11 +1,23 @@
 import { Trash2, Plus, ArrowUp, ArrowDown } from "lucide-react";
 
-const SpellsTab = ({ spells, incantations, onChange, onIncantationsChange }) => {
+const SpellsTab = ({
+  spells,
+  incantations,
+  onChange,
+  onIncantationsChange,
+}) => {
   // Add a new spell
   const handleAddSpell = () => {
     onChange([
       ...spells,
-      { name: "", level: 0, castings: 1, description: "", tradition: "" },
+      {
+        name: "",
+        level: 0,
+        castingsCurrent: 0,
+        castings: 1,
+        description: "",
+        tradition: "",
+      },
     ]);
   };
 
@@ -134,20 +146,39 @@ const SpellsTab = ({ spells, incantations, onChange, onIncantationsChange }) => 
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Castings
                 </label>
-                <div className="flex items-center">
+                <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="flex-1 p-2 border border-gray-300 rounded-l-md"
-                    value={spell.castings || 1}
+                    min={0}
+                    className="w-16 p-2 border border-gray-300 rounded-md"
+                    value={
+                      Number.isFinite(spell.castingsCurrent)
+                        ? spell.castingsCurrent
+                        : 0
+                    }
+                    onChange={(e) =>
+                      handleUpdateSpell(
+                        index,
+                        "castingsCurrent",
+                        Math.max(0, parseInt(e.target.value) || 0)
+                      )
+                    }
+                  />
+                  <span className="text-gray-500">/</span>
+                  <input
+                    type="number"
+                    min={0}
+                    className="w-16 p-2 border border-gray-300 rounded-md"
+                    value={Number.isFinite(spell.castings) ? spell.castings : 1}
                     onChange={(e) =>
                       handleUpdateSpell(
                         index,
                         "castings",
-                        parseInt(e.target.value) || 1
+                        Math.max(0, parseInt(e.target.value) || 0)
                       )
                     }
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col ml-1">
                     <button
                       className="text-gray-500 hover:text-gray-700"
                       onClick={() => moveSpell(index, -1)}
@@ -162,7 +193,7 @@ const SpellsTab = ({ spells, incantations, onChange, onIncantationsChange }) => 
                     </button>
                   </div>
                   <button
-                    className="bg-red-500 text-white p-2 rounded-r-md hover:bg-red-600 ml-1"
+                    className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600 ml-1"
                     onClick={() => handleRemoveSpell(index)}
                   >
                     <Trash2 className="h-5 w-5" />
@@ -206,31 +237,52 @@ const SpellsTab = ({ spells, incantations, onChange, onIncantationsChange }) => 
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label>
                 <input
                   type="text"
                   className="w-full p-2 border border-gray-300 rounded-md"
                   value={inc.name || ""}
-                  onChange={(e) => handleUpdateIncantation(index, "name", e.target.value)}
+                  onChange={(e) =>
+                    handleUpdateIncantation(index, "name", e.target.value)
+                  }
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description
+                </label>
                 <textarea
                   className="w-full p-2 border border-gray-300 rounded-md"
                   rows={2}
                   value={inc.description || ""}
-                  onChange={(e) => handleUpdateIncantation(index, "description", e.target.value)}
+                  onChange={(e) =>
+                    handleUpdateIncantation(
+                      index,
+                      "description",
+                      e.target.value
+                    )
+                  }
                 />
               </div>
               <div className="flex items-start space-x-2">
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => moveIncantation(index, -1)}>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => moveIncantation(index, -1)}
+                >
                   <ArrowUp className="h-5 w-5" />
                 </button>
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => moveIncantation(index, 1)}>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => moveIncantation(index, 1)}
+                >
                   <ArrowDown className="h-5 w-5" />
                 </button>
-                <button className="text-red-500 hover:text-red-700" onClick={() => handleRemoveIncantation(index)}>
+                <button
+                  className="text-red-500 hover:text-red-700"
+                  onClick={() => handleRemoveIncantation(index)}
+                >
                   <Trash2 className="h-5 w-5" />
                 </button>
               </div>
