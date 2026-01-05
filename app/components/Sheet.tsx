@@ -73,7 +73,7 @@ const ShadowOfTheDemonLordSheet = ({
     const data = charData || {
       info: {
         name: "",
-        level: 1,
+        level: 0,
         personality: "",
         background: "",
         ancestry: "",
