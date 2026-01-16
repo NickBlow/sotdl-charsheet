@@ -12,6 +12,7 @@ const CompanionsTab = ({ companions, onChange }) => {
         perception: 10,
         health: 0,
         defense: 0,
+        power: 0,
         insanity: 0,
         corruption: 0,
         strength: 10,
@@ -211,6 +212,23 @@ const CompanionsTab = ({ companions, onChange }) => {
                     handleUpdateCompanion(
                       index,
                       "defense",
+                      parseInt(e.target.value) || 0
+                    )
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Power
+                </label>
+                <input
+                  type="number"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  value={companion.power || 0}
+                  onChange={(e) =>
+                    handleUpdateCompanion(
+                      index,
+                      "power",
                       parseInt(e.target.value) || 0
                     )
                   }
